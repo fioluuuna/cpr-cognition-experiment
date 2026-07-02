@@ -1,0 +1,8 @@
+{
+  "name": "cpr-cognition-experiment",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs"
+  }
+}

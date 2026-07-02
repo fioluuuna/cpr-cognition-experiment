@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#124c57" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>CPR Cognition Experiment</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icon.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+  <main class="shell">
+    <header class="hero card">
+      <div>
+        <p class="eyebrow">Research Prototype</p>
+        <h1>CPR Cognition Experiment</h1>
+        <p class="lede">
+          iPhone 可用的急救引导实验版，用于比较不同解释深度在 CPR 场景中的行为影响。
+        </p>
+      </div>
+      <div class="hero-meta">
+        <span class="chip">CPR scenario</span>
+        <span class="chip" id="connChip">offline ready</span>
+        <span class="chip" id="clockChip">0:00</span>
+      </div>
+    </header>
+
+    <section id="setupView" class="card panel reveal">
+      <div class="panel-head">
+        <h2>Experiment setup</h2>
+        <p>先选实验条件，再开始任务。你也可以用“自动分配”让系统按被试 ID 分组。</p>
+      </div>
+      <div class="grid setup-grid">
+        <label>
+          <span>Participant ID</span>
+          <input id="participantId" type="text" placeholder="e.g. P01" />
+        </label>
+        <label>
+          <span>Assignment</span>
+          <select id="assignmentMode">
+            <option value="manual">Manual</option>
+            <option value="auto">Auto assign by ID</option>
+          </select>
+        </label>
+        <label>
+          <span>Explanation condition</span>
+          <select id="condition">
+            <option value="control">Control - no guidance</option>
+            <option value="direct">Direct - pure instruction</option>
+            <option value="concise">Concise - short rationale</option>
+            <option value="full">Full - detailed rationale</option>
+          </select>
+        </label>
+        <label>
+          <span>Time pressure</span>
+          <select id="pressure">
+            <option value="low">Low pressure</option>
+            <option value="high">High pressure</option>
+          </select>
+        </label>
+        <label>
+          <span>Scenario variant</span>
+          <select id="scenario">
+            <option value="baseline">Baseline CPR</option>
+            <option value="interrupt">CPR with bystander interruption</option>
+            <option value="compressed">Compressed CPR</option>
+          </select>
+        </label>
+        <label>
+          <span>Pre-task first aid familiarity</span>
+          <select id="familiarity">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="mini-cards">
+        <article class="mini-card">
+          <strong>Experiment logic</strong>
+          <p>解释深度是自变量，时间压力是情境变量，反应时、正确率、自评负荷与信任是结果。</p>
+        </article>
+        <article class="mini-card">
+          <strong>What gets logged</strong>
+          <p>每一步的响应时间、选择、是否超时、信心评分、负荷评分和最终问卷。</p>
+        </article>
+        <article class="mini-card">
+          <strong>iPhone use</strong>
+          <p>这个版本可以直接在 Safari 打开，也可以“添加到主屏幕”像 App 一样使用。</p>
+        </article>
+      </div>
+
+      <div class="actions">
+        <button id="startBtn" class="primary">Start experiment</button>
+        <button id="randomizeBtn" class="ghost">Randomize condition</button>
+      </div>
+    </section>
+
+    <section id="taskView" class="task-layout hidden">
+      <article class="card stage-card reveal">
+        <div class="stage-top">
+          <div>
+            <p class="eyebrow">Current stage</p>
+            <h2 id="stageTitle">Scene safety</h2>
+            <p id="stageDesc" class="muted"></p>
+          </div>
+          <div class="meter">
+            <div class="meter-label">
+              <span>Pressure</span>
+              <strong id="pressureLabel">Low</strong>
+            </div>
+            <div class="meter-bar"><span id="pressureFill"></span></div>
+          </div>
+        </div>
+
+        <div class="countdown">
+          <div>
+            <span class="eyebrow">Time left</span>
+            <h3 id="timerText">--:--</h3>
+          </div>
+          <div class="statline">
+            <span>Step</span>
+            <strong id="stepCounter">1 / 5</strong>
+          </div>
+          <div class="statline">
+            <span>Session</span>
+            <strong id="sessionBadge">P01</strong>
+          </div>
+        </div>
+
+        <div class="scenario-banner" id="scenarioBanner"></div>
+
+        <div class="guidance">
+          <p class="eyebrow">AI guidance</p>
+          <h3 id="guidanceTitle"></h3>
+          <p id="guidanceBody" class="guidance-body"></p>
+          <ul id="guidanceBullets" class="bullet-list"></ul>
+        </div>
+
+        <div class="prompt-block">
+          <p class="eyebrow">What would you do now?</p>
+          <div id="choiceButtons" class="choice-grid"></div>
+        </div>
+      </article>
+
+      <aside class="card side-card reveal">
+        <div class="panel-head">
+          <h2>Live log</h2>
+          <p>给实验用的可追溯记录，结束后可以下载 JSON，也可以自动保存到服务器。</p>
+        </div>
+        <div id="liveLog" class="log"></div>
+        <div class="summary-box">
+          <h3>Summary</h3>
+          <p id="summaryLine">No responses yet.</p>
+        </div>
+        <div class="actions stacked">
+          <button id="exportBtn" class="primary">Export log</button>
+          <button id="resetBtn" class="ghost">Reset session</button>
+        </div>
+      </aside>
+    </section>
+
+    <section id="ratingView" class="card rating-card hidden reveal">
+      <div class="panel-head">
+        <h2>Quick rating</h2>
+        <p>这一步用来补实验变量，不只是看你选了什么，也记录你当时的主观状态。</p>
+      </div>
+      <div class="rating-grid">
+        <label>
+          <span>Confidence in your last choice</span>
+          <input id="confidence" type="range" min="1" max="7" value="4" />
+          <output id="confidenceOut">4</output>
+        </label>
+        <label>
+          <span>Mental effort / cognitive load</span>
+          <input id="load" type="range" min="1" max="7" value="4" />
+          <output id="loadOut">4</output>
+        </label>
+      </div>
+      <div class="actions">
+        <button id="continueBtn" class="primary">Continue</button>
+      </div>
+    </section>
+
+    <section id="surveyView" class="card survey-card hidden reveal">
+      <div class="panel-head">
+        <h2>Post-task questionnaire</h2>
+        <p>结束问卷建议至少保留这些维度：负荷、信任、理解、可执行性和使用意愿。</p>
+      </div>
+      <div class="survey-grid" id="surveyForm"></div>
+      <div class="actions">
+        <button id="finishBtn" class="primary">Finish and save</button>
+      </div>
+    </section>
+
+    <section id="resultView" class="card result-card hidden reveal">
+      <div class="panel-head">
+        <h2>Session complete</h2>
+        <p>你可以把这份日志发给队友，或者作为实验保存记录。</p>
+      </div>
+      <pre id="resultJson" class="result-json"></pre>
+      <div class="actions">
+        <button id="downloadBtn" class="primary">Download JSON</button>
+        <button id="restartBtn" class="ghost">Start over</button>
+      </div>
+    </section>
+  </main>
+
+  <template id="surveyTemplate">
+    <label class="survey-item">
+      <span></span>
+      <input type="range" min="1" max="7" value="4" />
+      <output>4</output>
+    </label>
+  </template>
+
+  <script src="/app.js" type="module"></script>
+</body>
+</html>
