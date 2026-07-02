@@ -206,6 +206,7 @@ node server.mjs
 - `manifest.json`：PWA 配置
 - `sw.js`：离线缓存
 - `icon.svg`：应用图标
+- `实验员操作手册.md`：快速操作说明
 
 ---
 

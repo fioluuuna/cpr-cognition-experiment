@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import os from "node:os";
 import { extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -20,7 +21,8 @@ const mimeTypes = new Map([
 ]);
 
 function safeJoin(base, target) {
-  const resolved = resolve(base, target);
+  const cleaned = target.replace(/^\/+/, "");
+  const resolved = resolve(base, cleaned);
   if (!resolved.startsWith(base)) {
     throw new Error("Invalid path");
   }
@@ -55,6 +57,19 @@ async function saveSession(payload) {
   const filePath = join(artifactDir, fileName);
   await writeFile(filePath, JSON.stringify(payload, null, 2), "utf8");
   return { fileName, filePath };
+}
+
+function getLanUrls(portNumber) {
+  const urls = [];
+  const nets = os.networkInterfaces();
+  for (const entries of Object.values(nets)) {
+    for (const entry of entries || []) {
+      if (entry.family === "IPv4" && !entry.internal) {
+        urls.push(`http://${entry.address}:${portNumber}`);
+      }
+    }
+  }
+  return Array.from(new Set(urls));
 }
 
 const server = createServer(async (req, res) => {
@@ -98,4 +113,8 @@ const server = createServer(async (req, res) => {
 
 server.listen(port, "0.0.0.0", () => {
   console.log(`FirstAid web experiment running on http://0.0.0.0:${port}`);
+  console.log(`Open locally: http://localhost:${port}`);
+  for (const url of getLanUrls(port)) {
+    console.log(`Open on phone: ${url}`);
+  }
 });

@@ -253,6 +253,9 @@ const state = {
   explanationReplays: 0,
   explanationSkips: 0,
   pauseCount: 0,
+  isPaused: false,
+  pausedRemainingMs: 0,
+  pauseStartedAt: 0,
   midTaskInterruptions: 0,
   correctionAcceptCount: 0,
   correctionRejectCount: 0,
@@ -723,7 +726,7 @@ function speak(text, label = "speech") {
   window.speechSynthesis.speak(utterance);
 }
 
-function renderTask() {
+function renderTask(preserveDeadline = false) {
   const step = currentStep();
   if (!step) return;
   state.activeStepId = step.id;
@@ -735,7 +738,9 @@ function renderTask() {
   renderExplanation("step");
   renderScenarioBanner();
   renderActionButtons();
-  state.currentDeadline = now() + PRESSURES[state.pressure].stepSeconds * 1000;
+  if (!preserveDeadline) {
+    state.currentDeadline = now() + PRESSURES[state.pressure].stepSeconds * 1000;
+  }
   renderTimer();
   addEvent("step_presented", {
     stepTitle: step.title,
@@ -744,9 +749,7 @@ function renderTask() {
     pressure: state.pressure,
     countdownVisible: state.visibleCountdown,
   }, step.id);
-  if (state.pressure !== "low" && state.visibleCountdown) {
-    startPressureClock();
-  }
+  startPressureClock();
 }
 
 function renderActionButtons() {
@@ -769,6 +772,7 @@ function startPressureClock() {
   clearInterval(state.timerHandle);
   state.timerHandle = setInterval(() => {
     renderTimer();
+    if (state.isPaused) return;
     if (state.startedAt && state.phase === "task" && now() > state.currentDeadline) {
       addEvent("step_timeout", { step: state.activeStepId }, state.activeStepId);
       markResponse(currentStep(), "timeout", false, {
@@ -784,6 +788,13 @@ function startPressureClock() {
 function stopPressureClock() {
   clearInterval(state.timerHandle);
   state.timerHandle = null;
+}
+
+function updatePauseButtons() {
+  const label = state.isPaused ? "Resume task" : "Pause task";
+  [els.pauseBtn, els.pauseBtn2].forEach((button) => {
+    if (button) button.textContent = label;
+  });
 }
 
 function markResponse(step, choice, correct, extras = {}) {
@@ -886,11 +897,14 @@ function beginTrial() {
   state.explanationReplays = 0;
   state.explanationSkips = 0;
   state.pauseCount = 0;
+  state.isPaused = false;
+  state.pausedRemainingMs = 0;
+  state.pauseStartedAt = 0;
   state.currentChoice = null;
   state.stepIndex = 0;
   state.stepPresentedAt = now();
   state.taskStartTime = now();
-  state.visibleCountdown = state.countdownVisible;
+  state.visibleCountdown = state.countdownVisible ?? state.visibleCountdown;
   state.questionnaire = { pre: {}, post: {}, short: {} };
   state.taskState = {
     scenarioStatus: "scene_safe",
@@ -917,6 +931,7 @@ function beginTrial() {
     explanationMode: state.explanationMode,
     visibleCountdown: state.visibleCountdown,
   });
+  updatePauseButtons();
   switchPhase("participant");
   updateTopChips();
   renderParticipantPanel();
@@ -1039,11 +1054,23 @@ function startTask() {
 }
 
 function pauseTask() {
-  state.pauseCount += 1;
-  stopPressureClock();
-  addEvent("task_paused", { pauseCount: state.pauseCount });
-  state.liveViewLocked = true;
-  els.currentStageDesc.textContent = "Task paused by experimenter.";
+  if (!state.startedAt || !currentStep()) return;
+  if (!state.isPaused) {
+    state.pauseCount += 1;
+    state.isPaused = true;
+    state.pauseStartedAt = now();
+    state.pausedRemainingMs = Math.max(0, state.currentDeadline - now());
+    stopPressureClock();
+    addEvent("task_paused", { pauseCount: state.pauseCount, remainingMs: state.pausedRemainingMs });
+    els.currentStageDesc.textContent = "Task paused by experimenter.";
+  } else {
+    state.isPaused = false;
+    state.currentDeadline = now() + state.pausedRemainingMs;
+    state.pausedRemainingMs = 0;
+    addEvent("task_resumed", { pauseCount: state.pauseCount });
+    renderTask(true);
+  }
+  updatePauseButtons();
 }
 
 function endTask() {
@@ -1155,10 +1182,22 @@ async function saveToServer() {
 function downloadText(text, filename, mime = "application/json") {
   const blob = new Blob([text], { type: mime });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
+  const canDownload = "download" in HTMLAnchorElement.prototype && !/iP(ad|hone|od)/.test(navigator.userAgent);
+  if (canDownload) {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 500);
+    return;
+  }
+  const fallbackUrl = `data:${mime};charset=utf-8,${encodeURIComponent(text)}`;
+  const opened = window.open(fallbackUrl, "_blank", "noopener,noreferrer");
+  if (!opened) {
+    alert("Export preview is ready on the page. Copy the text manually if your browser blocks downloads.");
+  }
   setTimeout(() => URL.revokeObjectURL(url), 500);
 }
 
@@ -1500,6 +1539,9 @@ function resetAll() {
   state.explanationReplays = 0;
   state.explanationSkips = 0;
   state.pauseCount = 0;
+  state.isPaused = false;
+  state.pausedRemainingMs = 0;
+  state.pauseStartedAt = 0;
   state.midTaskInterruptions = 0;
   state.correctionAcceptCount = 0;
   state.correctionRejectCount = 0;
@@ -1528,6 +1570,7 @@ function resetAll() {
   els.annotationInput.value = "";
   renderQuestionnaires();
   updateTopChips();
+  updatePauseButtons();
   renderSummary();
   switchPhase("setup");
 }
@@ -1574,6 +1617,7 @@ function bootstrap() {
   renderQuestionnaires();
   renderSetupPanel();
   updateTopChips();
+  updatePauseButtons();
   loadFromDraft();
   setInterval(renderTimer, 200);
   window.addEventListener("beforeunload", persistDraft);
