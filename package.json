@@ -1,5 +1,6 @@
 {
   "name": "cpr-cognition-experiment",
+  "description": "面向成人 CPR 急救引导研究的手机网页实验工具",
   "private": true,
   "type": "module",
   "scripts": {

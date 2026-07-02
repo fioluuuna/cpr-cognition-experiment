@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#124c57" />
+  <meta name="theme-color" content="#0f5f6c" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>CPR Cognition Experiment</title>
@@ -12,203 +12,424 @@
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <div class="bg-orb orb-a"></div>
-  <div class="bg-orb orb-b"></div>
-  <main class="shell">
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+
+  <main class="app-shell">
     <header class="hero card">
-      <div>
-        <p class="eyebrow">Research Prototype</p>
+      <div class="hero-copy">
+        <p class="eyebrow">Research tool for adult CPR guidance</p>
         <h1>CPR Cognition Experiment</h1>
         <p class="lede">
-          iPhone 可用的急救引导实验版，用于比较不同解释深度在 CPR 场景中的行为影响。
+          A mobile-first research prototype for studying explanation depth, time pressure,
+          cognitive load, trust calibration, interruption recovery, and action execution.
         </p>
       </div>
-      <div class="hero-meta">
-        <span class="chip">CPR scenario</span>
-        <span class="chip" id="connChip">offline ready</span>
-        <span class="chip" id="clockChip">0:00</span>
+      <div class="hero-stats">
+        <span class="chip" id="connectionChip">Online</span>
+        <span class="chip" id="conditionChip">Condition</span>
+        <span class="chip" id="pressureChip">Pressure</span>
+        <span class="chip" id="trialChip">Trial</span>
+        <span class="chip" id="stepChip">Step</span>
       </div>
     </header>
 
-    <section id="setupView" class="card panel reveal">
-      <div class="panel-head">
-        <h2>Experiment setup</h2>
-        <p>先选实验条件，再开始任务。你也可以用“自动分配”让系统按被试 ID 分组。</p>
-      </div>
-      <div class="grid setup-grid">
-        <label>
-          <span>Participant ID</span>
-          <input id="participantId" type="text" placeholder="e.g. P01" />
-        </label>
-        <label>
-          <span>Assignment</span>
-          <select id="assignmentMode">
-            <option value="manual">Manual</option>
-            <option value="auto">Auto assign by ID</option>
-          </select>
-        </label>
-        <label>
-          <span>Explanation condition</span>
-          <select id="condition">
-            <option value="control">Control - no guidance</option>
-            <option value="direct">Direct - pure instruction</option>
-            <option value="concise">Concise - short rationale</option>
-            <option value="full">Full - detailed rationale</option>
-          </select>
-        </label>
-        <label>
-          <span>Time pressure</span>
-          <select id="pressure">
-            <option value="low">Low pressure</option>
-            <option value="high">High pressure</option>
-          </select>
-        </label>
-        <label>
-          <span>Scenario variant</span>
-          <select id="scenario">
-            <option value="baseline">Baseline CPR</option>
-            <option value="interrupt">CPR with bystander interruption</option>
-            <option value="compressed">Compressed CPR</option>
-          </select>
-        </label>
-        <label>
-          <span>Pre-task first aid familiarity</span>
-          <select id="familiarity">
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
-        </label>
-      </div>
-
-      <div class="mini-cards">
-        <article class="mini-card">
-          <strong>Experiment logic</strong>
-          <p>解释深度是自变量，时间压力是情境变量，反应时、正确率、自评负荷与信任是结果。</p>
-        </article>
-        <article class="mini-card">
-          <strong>What gets logged</strong>
-          <p>每一步的响应时间、选择、是否超时、信心评分、负荷评分和最终问卷。</p>
-        </article>
-        <article class="mini-card">
-          <strong>iPhone use</strong>
-          <p>这个版本可以直接在 Safari 打开，也可以“添加到主屏幕”像 App 一样使用。</p>
-        </article>
-      </div>
-
-      <div class="actions">
-        <button id="startBtn" class="primary">Start experiment</button>
-        <button id="randomizeBtn" class="ghost">Randomize condition</button>
-      </div>
+    <section class="toolbar card">
+      <button class="tab-button active" data-target="setup">Setup</button>
+      <button class="tab-button" data-target="participant">Participant Flow</button>
+      <button class="tab-button" data-target="task">Task</button>
+      <button class="tab-button" data-target="questionnaire">Questionnaire</button>
+      <button class="tab-button" data-target="experimenter">Experimenter Console</button>
+      <button class="tab-button" data-target="replay">Replay & Annotation</button>
+      <button class="tab-button" data-target="export">Export</button>
     </section>
 
-    <section id="taskView" class="task-layout hidden">
-      <article class="card stage-card reveal">
-        <div class="stage-top">
-          <div>
-            <p class="eyebrow">Current stage</p>
-            <h2 id="stageTitle">Scene safety</h2>
-            <p id="stageDesc" class="muted"></p>
-          </div>
-          <div class="meter">
-            <div class="meter-label">
-              <span>Pressure</span>
-              <strong id="pressureLabel">Low</strong>
-            </div>
-            <div class="meter-bar"><span id="pressureFill"></span></div>
-          </div>
+    <section id="setupView" class="panel-grid">
+      <article class="card panel">
+        <div class="panel-head">
+          <h2>Session setup</h2>
+          <p>Set the participant ID, trial index, condition, pressure, and scenario before starting.</p>
         </div>
-
-        <div class="countdown">
-          <div>
-            <span class="eyebrow">Time left</span>
-            <h3 id="timerText">--:--</h3>
-          </div>
-          <div class="statline">
-            <span>Step</span>
-            <strong id="stepCounter">1 / 5</strong>
-          </div>
-          <div class="statline">
-            <span>Session</span>
-            <strong id="sessionBadge">P01</strong>
-          </div>
+        <div class="form-grid">
+          <label class="field">
+            <span>Participant ID</span>
+            <input id="participantId" type="text" placeholder="P01" />
+          </label>
+          <label class="field">
+            <span>Trial index</span>
+            <input id="trialIndex" type="number" min="1" value="1" />
+          </label>
+          <label class="field">
+            <span>Explanation depth</span>
+            <select id="condition">
+              <option value="control">Control - No explanation</option>
+              <option value="direct">Direct - Instruction only</option>
+              <option value="concise">Concise - Brief rationale</option>
+              <option value="full">Full - Detailed rationale</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Time pressure</span>
+            <select id="pressure">
+              <option value="low">Low</option>
+              <option value="high">High</option>
+              <option value="hidden">Hidden countdown</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Scenario variant</span>
+            <select id="scenario">
+              <option value="baseline">Baseline CPR</option>
+              <option value="interrupt">Interruptive CPR</option>
+              <option value="error">Error-correction CPR</option>
+              <option value="stress">High-stress CPR</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Interface mode</span>
+            <select id="explanationMode">
+              <option value="control">Control</option>
+              <option value="direct">Direct</option>
+              <option value="concise">Concise</option>
+              <option value="full">Full</option>
+            </select>
+          </label>
+          <label class="field check-inline">
+            <input id="countdownToggle" type="checkbox" checked />
+            <span>Show countdown during task</span>
+          </label>
         </div>
-
-        <div class="scenario-banner" id="scenarioBanner"></div>
-
-        <div class="guidance">
-          <p class="eyebrow">AI guidance</p>
-          <h3 id="guidanceTitle"></h3>
-          <p id="guidanceBody" class="guidance-body"></p>
-          <ul id="guidanceBullets" class="bullet-list"></ul>
-        </div>
-
-        <div class="prompt-block">
-          <p class="eyebrow">What would you do now?</p>
-          <div id="choiceButtons" class="choice-grid"></div>
+        <label class="field">
+          <span>Experimenter notes</span>
+          <textarea id="participantNotes" rows="4" placeholder="Optional session notes or participant observations"></textarea>
+        </label>
+        <div class="button-grid">
+          <button id="randomizeBtn" class="ghost">Randomize</button>
+          <button id="loadDraftBtn" class="ghost">Load Draft</button>
+          <button id="saveDraftBtn" class="ghost">Save Draft</button>
+          <button id="startBtn" class="primary">Start Experiment</button>
         </div>
       </article>
 
-      <aside class="card side-card reveal">
-        <div class="panel-head">
-          <h2>Live log</h2>
-          <p>给实验用的可追溯记录，结束后可以下载 JSON，也可以自动保存到服务器。</p>
-        </div>
-        <div id="liveLog" class="log"></div>
-        <div class="summary-box">
-          <h3>Summary</h3>
-          <p id="summaryLine">No responses yet.</p>
-        </div>
-        <div class="actions stacked">
-          <button id="exportBtn" class="primary">Export log</button>
-          <button id="resetBtn" class="ghost">Reset session</button>
+      <aside class="card panel side-panel">
+        <h2>Research logic</h2>
+        <ul class="bullet-list">
+          <li>Independent variables: explanation depth, time pressure, scenario variant.</li>
+          <li>Mechanisms: cognitive load, trust calibration, interruption recovery.</li>
+          <li>Outcomes: response delay, order completion, correction acceptance, execution quality.</li>
+          <li>Logging is session-level, trial-level, and step-level.</li>
+        </ul>
+        <div class="mini-grid">
+          <div class="mini-card">
+            <strong>Supported outputs</strong>
+            <p>JSON, CSV, replay index, annotations, questionnaire data.</p>
+          </div>
+          <div class="mini-card">
+            <strong>Platform</strong>
+            <p>Runs in Safari on iPhone and any mobile browser.</p>
+          </div>
         </div>
       </aside>
     </section>
 
-    <section id="ratingView" class="card rating-card hidden reveal">
-      <div class="panel-head">
-        <h2>Quick rating</h2>
-        <p>这一步用来补实验变量，不只是看你选了什么，也记录你当时的主观状态。</p>
-      </div>
-      <div class="rating-grid">
-        <label>
-          <span>Confidence in your last choice</span>
-          <input id="confidence" type="range" min="1" max="7" value="4" />
-          <output id="confidenceOut">4</output>
-        </label>
-        <label>
-          <span>Mental effort / cognitive load</span>
-          <input id="load" type="range" min="1" max="7" value="4" />
-          <output id="loadOut">4</output>
-        </label>
-      </div>
-      <div class="actions">
-        <button id="continueBtn" class="primary">Continue</button>
-      </div>
+    <section id="participantView" class="panel-grid hidden">
+      <article class="card panel large-panel">
+        <div class="panel-head">
+          <h2>Participant flow</h2>
+          <p>Consent, device check, training, task entry, and post-task reflection are arranged as one guided flow.</p>
+        </div>
+
+        <div class="flow-steps">
+          <article class="flow-card">
+            <h3>1. Study introduction</h3>
+            <p>Explain that this is a CPR cognition study, not a medical product.</p>
+            <div class="button-row">
+              <button id="consentYes" class="primary">Consent accepted</button>
+              <button id="consentNo" class="ghost">Consent declined</button>
+            </div>
+          </article>
+          <article class="flow-card">
+            <h3>2. Device check</h3>
+            <p>Confirm the browser, viewport, and basic interaction readiness.</p>
+            <div class="button-row">
+              <button id="deviceCheckBtn" class="ghost">Run device check</button>
+            </div>
+          </article>
+          <article class="flow-card">
+            <h3>3. Training / example</h3>
+            <p>Show one example explanation so the participant understands how the interface behaves.</p>
+            <div class="button-row">
+              <button id="trainingBtn" class="ghost">Play training example</button>
+            </div>
+          </article>
+          <article class="flow-card">
+            <h3>4. Start task</h3>
+            <p>Enter the CPR scenario and begin the timed decision sequence.</p>
+            <div class="button-row">
+              <button id="beginTaskBtn" class="primary">Begin timed task</button>
+            </div>
+          </article>
+          <article class="flow-card">
+            <h3>5. Interview entry</h3>
+            <p>After the task, use the interview section for retrospective comments.</p>
+            <div class="button-row">
+              <button class="tab-button ghost" data-target="interview">Open interview entry</button>
+            </div>
+          </article>
+        </div>
+
+        <div class="status-strip">
+          <div id="participantOverview">Participant: - | Trial: - | Condition: -</div>
+          <div id="statusSummary">Current summary: -</div>
+        </div>
+      </article>
     </section>
 
-    <section id="surveyView" class="card survey-card hidden reveal">
-      <div class="panel-head">
-        <h2>Post-task questionnaire</h2>
-        <p>结束问卷建议至少保留这些维度：负荷、信任、理解、可执行性和使用意愿。</p>
-      </div>
-      <div class="survey-grid" id="surveyForm"></div>
-      <div class="actions">
-        <button id="finishBtn" class="primary">Finish and save</button>
-      </div>
+    <section id="taskView" class="panel-grid hidden">
+      <article class="card panel task-panel">
+        <div class="stage-top">
+          <div>
+            <p class="eyebrow">Formal task</p>
+            <h2 id="currentStageTitle">Task stage</h2>
+            <p id="currentStageDesc" class="stage-desc"></p>
+          </div>
+          <div class="timer-box">
+            <div class="timer-meta">
+              <span id="visibleCountdownLabel">Visible timer</span>
+              <strong id="totalClock">0:00</strong>
+            </div>
+            <div class="timer-ring">
+              <span id="progressFill"></span>
+            </div>
+            <div class="timer-readout">
+              <span>Step clock</span>
+              <strong id="timerText">--:--</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="chips-row">
+          <span class="mini-chip" id="pressureLabel">Low</span>
+          <span class="mini-chip" id="modeLabel">Instruction only</span>
+          <span class="mini-chip" id="stepProgressText">Step 1 / 5</span>
+        </div>
+
+        <div id="scenarioBanner" class="scenario-banner"></div>
+
+        <section id="explanationCard" class="explanation-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Explanation</p>
+              <h3 id="explanationTitle">Condition explanation</h3>
+            </div>
+            <div class="button-row compact">
+              <button id="explainMoreBtn" class="ghost">More explanation</button>
+              <button id="repeatExplanationBtn" class="ghost">Repeat</button>
+              <button id="skipExplanationBtn" class="ghost">Skip</button>
+            </div>
+          </div>
+          <p id="explanationBody" class="explanation-body"></p>
+          <ul id="explanationBullets" class="bullet-list"></ul>
+          <div id="explanationCues" class="cue-box"></div>
+        </section>
+
+        <section class="action-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Behavior execution</p>
+              <h3>Choose the next action</h3>
+            </div>
+            <span class="helper">Every click is logged with timestamp and state context.</span>
+          </div>
+          <div id="responseGrid" class="choice-grid"></div>
+          <div class="button-row">
+            <button id="acceptCorrectionBtn" class="ghost">Accept correction</button>
+            <button id="rejectCorrectionBtn" class="ghost">Reject correction</button>
+          </div>
+        </section>
+
+        <div class="experiment-actions">
+          <button id="pauseBtn" class="ghost">Pause</button>
+          <button id="endTaskBtn" class="ghost">End task</button>
+          <button id="injectErrorBtn" class="ghost">Inject error</button>
+          <button id="injectInterruptBtn" class="ghost">Inject interruption</button>
+          <button id="injectReminderBtn" class="ghost">Inject reminder</button>
+          <button id="injectCorrectionBtn" class="ghost">Inject correction</button>
+        </div>
+      </article>
+
+      <aside class="card panel side-panel">
+        <h2>Live log</h2>
+        <div id="liveLog" class="log-list"></div>
+        <div class="summary-card">
+          <h3>Current summary</h3>
+          <ul id="summaryList" class="bullet-list compact"></ul>
+        </div>
+      </aside>
     </section>
 
-    <section id="resultView" class="card result-card hidden reveal">
-      <div class="panel-head">
-        <h2>Session complete</h2>
-        <p>你可以把这份日志发给队友，或者作为实验保存记录。</p>
-      </div>
-      <pre id="resultJson" class="result-json"></pre>
-      <div class="actions">
-        <button id="downloadBtn" class="primary">Download JSON</button>
-        <button id="restartBtn" class="ghost">Start over</button>
-      </div>
+    <section id="questionnaireView" class="panel-grid hidden">
+      <article class="card panel">
+        <div class="panel-head">
+          <h2>Questionnaires</h2>
+          <p>Keep the post-task ratings short enough to avoid survey fatigue.</p>
+        </div>
+        <div class="survey-layout">
+          <div>
+            <h3>Pre-task</h3>
+            <div id="questionnairePre" class="survey-group"></div>
+          </div>
+          <div>
+            <h3>Post-task</h3>
+            <div id="questionnairePost" class="survey-group"></div>
+          </div>
+          <div>
+            <h3>Short ratings</h3>
+            <div id="questionnaireShort" class="survey-group"></div>
+          </div>
+        </div>
+        <div class="button-grid">
+          <button class="tab-button primary" data-target="interview">Open interview</button>
+          <button id="addNoteBtn" class="ghost">Save notes</button>
+          <button id="clearBtn" class="ghost">Reset session</button>
+        </div>
+      </article>
+    </section>
+
+    <section id="interviewView" class="panel-grid hidden">
+      <article class="card panel">
+        <div class="panel-head">
+          <h2>Retrospective interview entry</h2>
+          <p>Use this page to capture open-ended comments after the task.</p>
+        </div>
+        <label class="field">
+          <span>Open-ended reflection</span>
+          <textarea id="participantNotes" rows="8" placeholder="What was confusing? Which explanation felt most useful? What changed your action?"></textarea>
+        </label>
+        <div class="button-grid">
+          <button id="saveDraftBtn" class="ghost">Save draft</button>
+          <button id="addNoteBtn" class="ghost">Save note</button>
+          <button id="finishSessionBtn" class="primary">Finish session</button>
+          <button class="tab-button primary" data-target="export">Go to export</button>
+        </div>
+      </article>
+    </section>
+
+    <section id="experimenterView" class="panel-grid hidden">
+      <article class="card panel">
+        <div class="panel-head">
+          <h2>Experimenter console</h2>
+          <p>Use this panel to control the trial, inject events, and monitor the current state.</p>
+        </div>
+        <div class="console-grid">
+          <div class="console-card">
+            <h3>Status</h3>
+            <p id="experimenterStatus">Ready.</p>
+            <p id="experimenterStep">No active step.</p>
+            <p id="experimenterMetrics">No metrics yet.</p>
+          </div>
+          <div class="console-card">
+            <h3>Controls</h3>
+            <div class="button-grid">
+              <button id="beginTaskBtn2" class="primary">Start task</button>
+              <button id="pauseBtn2" class="ghost">Pause task</button>
+              <button id="endTaskBtn2" class="ghost">End task</button>
+              <button id="injectErrorBtn2" class="ghost">Inject error</button>
+              <button id="injectInterruptBtn2" class="ghost">Inject interruption</button>
+              <button id="injectReminderBtn2" class="ghost">Inject reminder</button>
+              <button id="previousStepBtn" class="ghost">Previous step</button>
+              <button id="repeatStepBtn" class="ghost">Repeat current step</button>
+            </div>
+          </div>
+          <div class="console-card">
+            <h3>Condition control</h3>
+            <p>Change the current condition only before the trial starts, unless you are intentionally testing switching behavior.</p>
+            <button id="switchConditionBtn" class="ghost">Refresh condition chips</button>
+          </div>
+          <div class="console-card">
+            <h3>Annotations</h3>
+            <label class="field">
+              <span>Annotation type</span>
+              <select id="annotationType">
+                <option value="error">Error</option>
+                <option value="interruption">Interruption</option>
+                <option value="recovery">Recovery</option>
+                <option value="correction_accept">Correction accepted</option>
+                <option value="correction_reject">Correction rejected</option>
+                <option value="observer_note">Observer note</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Annotation text</span>
+              <textarea id="annotationInput" rows="4" placeholder="Type an observation for later coding"></textarea>
+            </label>
+            <div class="button-row">
+              <button id="annotationBtn" class="primary">Add annotation</button>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section id="replayView" class="panel-grid hidden">
+      <article class="card panel replay-panel">
+        <div class="panel-head">
+          <h2>Replay & annotation</h2>
+          <p>Use the event timeline to inspect behavior, step transitions, and errors.</p>
+        </div>
+        <div class="replay-controls">
+          <select id="replayFilter">
+            <option value="all">All events</option>
+            <option value="step_presented">Step presented</option>
+            <option value="choice_made">Choice made</option>
+            <option value="step_error">Error</option>
+            <option value="injected_interruption">Interruption</option>
+            <option value="correction_accepted">Correction accepted</option>
+          </select>
+          <button id="downloadReplayBtn" class="ghost">Download replay JSON</button>
+        </div>
+        <div class="replay-layout">
+          <div id="replayList" class="replay-list"></div>
+          <pre id="replayDetail" class="replay-detail"></pre>
+        </div>
+      </article>
+    </section>
+
+    <section id="exportView" class="panel-grid hidden">
+      <article class="card panel">
+        <div class="panel-head">
+          <h2>Export</h2>
+          <p>Export the raw session record as JSON or CSV for downstream analysis.</p>
+        </div>
+        <div class="button-grid">
+          <button id="exportJsonBtn" class="primary">Export JSON</button>
+          <button id="exportCsvBtn" class="ghost">Export CSV</button>
+        </div>
+        <div class="export-grid">
+          <div>
+            <h3>JSON preview</h3>
+            <pre id="resultJson" class="code-box"></pre>
+          </div>
+          <div>
+            <h3>CSV preview</h3>
+            <pre id="resultCsv" class="code-box"></pre>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section id="completeView" class="panel-grid hidden">
+      <article class="card panel">
+        <div class="panel-head">
+          <h2>Session complete</h2>
+          <p>The session is finished and the export data is ready.</p>
+        </div>
+        <div class="button-grid">
+          <button class="tab-button primary" data-target="export">Review export</button>
+          <button class="tab-button ghost" data-target="replay">Open replay</button>
+          <button class="ghost" id="clearBtn2">Reset session</button>
+        </div>
+      </article>
     </section>
   </main>
 
@@ -220,6 +441,6 @@
     </label>
   </template>
 
-  <script src="/app.js" type="module"></script>
+  <script type="module" src="/app.js"></script>
 </body>
 </html>

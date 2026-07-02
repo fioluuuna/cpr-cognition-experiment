@@ -1,42 +1,215 @@
 # CPR Cognition Experiment
 
-Mobile web prototype for the emergency-aid research idea.
+这是一个面向**成人 CPR 急救引导研究**的手机网页实验工具。  
+它不是商业急救产品，而是为了帮助你们稳定操控实验条件、记录全过程数据、导出可分析日志，并支持后期回放和人工标注。
 
-## What it does
+## 一、这个工具要研究什么
 
-- Runs in iPhone Safari or any mobile browser
-- Supports 4 explanation conditions:
-  - Control
-  - Direct
-  - Concise
-  - Full
-- Supports 3 pressure / scenario variants
-- Logs:
-  - reaction time
-  - choice
-  - timeouts
-  - confidence
-  - perceived load
-  - post-task questionnaire
-- Exports JSON locally and can POST the session to the server for archiving
+这个 prototype 主要支持五类研究变量：
 
-## How to run
+1. **解释深度**
+   - Control：无解释
+   - Direct：纯指令型
+   - Concise：简释型
+   - Full：全释型
+
+2. **时间压力**
+   - Low：低压
+   - High：高压
+   - Hidden countdown：隐藏倒计时
+
+3. **认知负荷**
+   - 任务后量表
+   - 任务中短评分
+   - 行为代理指标
+   - 可选的研究员观察标注
+
+4. **信任校准**
+   - 任务前基线
+   - 任务中变化
+   - 任务后评分
+   - 接受/拒绝纠错记录
+
+5. **行为执行**
+   - 起始反应时间
+   - 每一步完成时间
+   - 顺序完成情况
+   - 错误/遗漏/重复/跳步
+   - 中断与恢复
+   - 纠错接受速度
+
+---
+
+## 二、当前支持的功能
+
+### 1. 参与者界面
+- 研究说明页
+- 知情同意页
+- 设备检查页
+- 训练/示例页
+- 正式任务页
+- 解释呈现页
+- 压力提示页
+- 行为操作页
+- 纠错反馈页
+- 任务完成页
+- 事后问卷页
+- 回顾访谈入口
+
+### 2. 任务场景模块
+- 至少支持一个主场景：成人 CPR / 疑似心脏骤停
+- 支持分段展示
+- 支持信息逐步释放
+- 支持多种场景版本
+- 支持中断、错误、提醒事件插入
+
+### 3. 解释深度模块
+- 三层解释深度统一控制
+- 支持文字、语音、界面同时切换
+- 支持“更多解释”
+- 支持“重复解释”
+- 支持“跳过解释”
+- 记录解释请求次数、重复次数、跳过次数
+
+### 4. 时间压力模块
+- 支持低压 / 高压 / 隐藏倒计时
+- 支持每一步限时
+- 支持操作超时提醒
+- 支持压力提示音
+- 记录超时、停顿、首次响应延迟
+
+### 5. 行为日志模块
+- 记录所有按钮点击
+- 记录所有页面切换
+- 记录所有解释展开、重播、跳过
+- 记录所有语音播放事件
+- 记录所有纠错、打断、中断、恢复
+- 记录 session id、condition id、trial id、step id、timestamp
+
+### 6. 问卷模块
+- 任务前基本信息
+- 任务前经验筛查
+- 任务前自我效能
+- 任务后紧张度
+- 任务后认知负荷
+- 任务后信任
+- 任务后理解感
+- 任务后控制感
+- 任务后接受度
+- 开放题与访谈入口
+
+### 7. 实验员控制台
+- 选择参与者
+- 分配实验条件
+- 启动 / 暂停 / 结束实验
+- 手动插入事件
+- 手动触发错误、纠错、中断、提醒
+- 查看实时日志
+- 查看当前步骤
+- 添加实验标注
+
+### 8. 回放与导出
+- 任务回放
+- 时间线筛选
+- 事件详情查看
+- 标注结果导出
+- JSON 导出
+- CSV 导出
+- replay JSON 导出
+
+---
+
+## 三、怎么运行
+
+在项目目录中执行：
 
 ```powershell
 node server.mjs
 ```
 
-Then open the printed URL on your phone browser.
+然后打开终端里提示的地址。
 
-## How to use on iPhone
+如果你要让 iPhone 打开：
 
-1. Connect the iPhone and the computer to the same Wi-Fi.
-2. Open the site in Safari with the computer IP address.
-3. Optionally tap Share -> Add to Home Screen.
+1. 电脑和 iPhone 连同一个 Wi-Fi
+2. 在 iPhone 的 Safari 中打开电脑的局域网地址
+3. 如果需要，点“共享 -> 添加到主屏幕”
 
-## Suggested experiment flow
+---
 
-1. Enter participant ID.
-2. Select or randomize condition.
-3. Run the CPR scenario.
-4. Save the exported JSON.
+## 四、推荐实验流程
+
+### 标准流程
+1. 进入说明页
+2. 知情同意
+3. 设备检查
+4. 训练/示例
+5. 正式场景
+6. 系统引导与解释
+7. 参与者执行动作
+8. 系统纠错或中断
+9. 恢复执行
+10. 任务后问卷
+11. 回顾访谈
+12. 导出 JSON / CSV
+
+### 适合后续论文的重点指标
+- 反应时间
+- 每一步完成时间
+- 流程完整度
+- 错误率
+- 中断恢复时间
+- 纠错接受率
+- 解释请求次数
+- 解释跳过次数
+- 信任变化
+- 认知负荷评分
+
+---
+
+## 五、适合你们论文写法的建议
+
+你们可以把这个工具当成一个“**急救情境下的人机交互实验平台**”，而不是一个产品原型。
+
+更适合的表述是：
+
+> 本研究构建了一个面向成人 CPR 的网页实验工具，用于系统操控解释深度与时间压力，并记录参与者在任务执行过程中的认知负荷、信任校准和行为表现。
+
+这样写更容易把它放进 HCI / CHI 语境里。
+
+---
+
+## 六、文件输出
+
+完成一次实验后，你可以拿到：
+
+- `JSON`：完整会话数据
+- `CSV`：事件日志
+- `replay JSON`：回放与标注数据
+
+这些数据适合后面做：
+
+- 量表统计
+- 过程分析
+- 事件编码
+- 回放标注
+- 条件对比
+
+---
+
+## 七、当前目录说明
+
+- `index.html`：界面
+- `app.js`：实验逻辑
+- `styles.css`：样式
+- `server.mjs`：本地服务器和存档
+- `manifest.json`：PWA 配置
+- `sw.js`：离线缓存
+- `icon.svg`：应用图标
+
+---
+
+## 八、一个很重要的提醒
+
+这个工具是为了研究，不是医疗替代方案。  
+在真实急救场景中，优先呼叫当地急救电话并遵循当地急救规范。
