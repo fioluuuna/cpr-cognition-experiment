@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0f5f6c" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>CPR Cognition Experiment</title>
+  <title>CPR 认知实验</title>
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icon.svg" />
   <link rel="stylesheet" href="/styles.css" />
@@ -18,115 +18,111 @@
   <main class="app-shell">
     <header class="hero card">
       <div class="hero-copy">
-        <p class="eyebrow">Research tool for adult CPR guidance</p>
-        <h1>CPR Cognition Experiment</h1>
+        <p class="eyebrow">成人 CPR 引导研究工具</p>
+        <h1>CPR 认知实验</h1>
         <p class="lede">
-          A mobile-first research prototype for studying explanation depth, time pressure,
-          cognitive load, trust calibration, interruption recovery, and action execution.
+          这是一个面向研究的网页版原型，用于操控解释深度、时间压力、认知负荷、信任校准和行为执行，并稳定记录全过程日志。
         </p>
       </div>
       <div class="hero-stats">
-        <span class="chip" id="connectionChip">Online</span>
-        <span class="chip" id="conditionChip">Condition</span>
-        <span class="chip" id="pressureChip">Pressure</span>
-        <span class="chip" id="trialChip">Trial</span>
-        <span class="chip" id="stepChip">Step</span>
+        <span class="chip" id="connectionChip">在线</span>
+        <span class="chip" id="conditionChip">解释条件</span>
+        <span class="chip" id="pressureChip">时间压力</span>
+        <span class="chip" id="trialChip">试次</span>
+        <span class="chip" id="stepChip">步骤</span>
+        <button id="localeToggle" class="chip lang-toggle" type="button">English</button>
       </div>
     </header>
 
     <section class="toolbar card">
-      <button class="tab-button active" data-target="setup">Setup</button>
-      <button class="tab-button" data-target="participant">Participant Flow</button>
-      <button class="tab-button" data-target="task">Task</button>
-      <button class="tab-button" data-target="questionnaire">Questionnaire</button>
-      <button class="tab-button" data-target="experimenter">Experimenter Console</button>
-      <button class="tab-button" data-target="replay">Replay & Annotation</button>
-      <button class="tab-button" data-target="export">Export</button>
+      <button class="tab-button active" data-target="setup">设置</button>
+      <button class="tab-button" data-target="participant">参与者流程</button>
+      <button class="tab-button" data-target="task">正式任务</button>
+      <button class="tab-button" data-target="questionnaire">问卷</button>
+      <button class="tab-button" data-target="experimenter">实验员控制台</button>
+      <button class="tab-button" data-target="replay">回放与标注</button>
+      <button class="tab-button" data-target="export">导出</button>
     </section>
 
     <section id="setupView" class="panel-grid">
       <article class="card panel">
         <div class="panel-head">
-          <h2>Session setup</h2>
-          <p>Set the participant ID, trial index, condition, pressure, and scenario before starting.</p>
+          <h2>会话设置</h2>
+          <p>开始前请设置参与者编号、试次、解释条件、压力条件和场景版本。</p>
         </div>
         <div class="form-grid">
           <label class="field">
-            <span>Participant ID</span>
+            <span>参与者编号</span>
             <input id="participantId" type="text" placeholder="P01" />
           </label>
           <label class="field">
-            <span>Trial index</span>
+            <span>试次编号</span>
             <input id="trialIndex" type="number" min="1" value="1" />
           </label>
           <label class="field">
-            <span>Explanation depth</span>
+            <span>解释深度</span>
             <select id="condition">
-              <option value="control">Control - No explanation</option>
-              <option value="direct">Direct - Instruction only</option>
-              <option value="concise">Concise - Brief rationale</option>
-              <option value="full">Full - Detailed rationale</option>
+              <option value="control">对照组</option>
+              <option value="direct">纯指令型</option>
+              <option value="concise">简释型</option>
+              <option value="full">全释型</option>
             </select>
           </label>
           <label class="field">
-            <span>Time pressure</span>
+            <span>时间压力</span>
             <select id="pressure">
-              <option value="low">Low</option>
-              <option value="high">High</option>
-              <option value="hidden">Hidden countdown</option>
+              <option value="low">低压</option>
+              <option value="high">高压</option>
+              <option value="hidden">隐藏倒计时</option>
             </select>
           </label>
           <label class="field">
-            <span>Scenario variant</span>
+            <span>场景版本</span>
             <select id="scenario">
-              <option value="baseline">Baseline CPR</option>
-              <option value="interrupt">Interruptive CPR</option>
-              <option value="error">Error-correction CPR</option>
-              <option value="stress">High-stress CPR</option>
+              <option value="baseline">基础 CPR</option>
+              <option value="interrupt">打断版 CPR</option>
+              <option value="error">纠错版 CPR</option>
+              <option value="stress">高压力 CPR</option>
             </select>
           </label>
           <label class="field">
-            <span>Interface mode</span>
+            <span>界面模式</span>
             <select id="explanationMode">
-              <option value="control">Control</option>
-              <option value="direct">Direct</option>
-              <option value="concise">Concise</option>
-              <option value="full">Full</option>
+              <option value="control">对照</option>
+              <option value="direct">纯指令</option>
+              <option value="concise">简释</option>
+              <option value="full">全释</option>
             </select>
           </label>
           <label class="field check-inline">
             <input id="countdownToggle" type="checkbox" checked />
-            <span>Show countdown during task</span>
+            <span>任务中显示倒计时</span>
           </label>
         </div>
-        <label class="field">
-          <span>Experimenter notes</span>
-          <textarea id="participantNotes" rows="4" placeholder="Optional session notes or participant observations"></textarea>
-        </label>
         <div class="button-grid">
-          <button id="randomizeBtn" class="ghost">Randomize</button>
-          <button id="loadDraftBtn" class="ghost">Load Draft</button>
-          <button id="saveDraftBtn" class="ghost">Save Draft</button>
-          <button id="startBtn" class="primary">Start Experiment</button>
+          <button id="randomizeBtn" class="ghost">随机分配</button>
+          <button id="loadDraftBtn" class="ghost">载入草稿</button>
+          <button id="saveDraftBtn" class="ghost">保存草稿</button>
+          <button id="startBtn" class="primary">开始实验</button>
         </div>
       </article>
 
       <aside class="card panel side-panel">
-        <h2>Research logic</h2>
+        <h2>研究逻辑</h2>
         <ul class="bullet-list">
-          <li>Independent variables: explanation depth, time pressure, scenario variant.</li>
-          <li>Mechanisms: cognitive load, trust calibration, interruption recovery.</li>
-          <li>Outcomes: response delay, order completion, correction acceptance, execution quality.</li>
-          <li>Logging is session-level, trial-level, and step-level.</li>
+          <li>自变量：解释深度、时间压力、场景版本。</li>
+          <li>机制：认知负荷、信任校准、中断恢复。</li>
+          <li>结果：响应延迟、流程完整度、纠错接受、执行质量。</li>
+          <li>日志分为会话级、试次级和步骤级。</li>
         </ul>
         <div class="mini-grid">
           <div class="mini-card">
-            <strong>Supported outputs</strong>
-            <p>JSON, CSV, replay index, annotations, questionnaire data.</p>
+            <strong>支持导出</strong>
+            <p>JSON、CSV、回放索引、标注和问卷数据。</p>
           </div>
           <div class="mini-card">
-            <strong>Platform</strong>
-            <p>Runs in Safari on iPhone and any mobile browser.</p>
+            <strong>平台</strong>
+            <p>可在 iPhone 的 Safari 和其他手机浏览器中运行。</p>
           </div>
         </div>
       </aside>
@@ -135,52 +131,52 @@
     <section id="participantView" class="panel-grid hidden">
       <article class="card panel large-panel">
         <div class="panel-head">
-          <h2>Participant flow</h2>
-          <p>Consent, device check, training, task entry, and post-task reflection are arranged as one guided flow.</p>
+          <h2>参与者流程</h2>
+          <p>知情同意、设备检查、训练示例、正式任务和事后回顾被组织成连续流程。</p>
         </div>
 
         <div class="flow-steps">
           <article class="flow-card">
-            <h3>1. Study introduction</h3>
-            <p>Explain that this is a CPR cognition study, not a medical product.</p>
+            <h3>1. 研究说明</h3>
+            <p>说明这是一个 CPR 认知研究，而不是医疗产品。</p>
             <div class="button-row">
-              <button id="consentYes" class="primary">Consent accepted</button>
-              <button id="consentNo" class="ghost">Consent declined</button>
+              <button id="consentYes" class="primary">同意参与</button>
+              <button id="consentNo" class="ghost">不同意</button>
             </div>
           </article>
           <article class="flow-card">
-            <h3>2. Device check</h3>
-            <p>Confirm the browser, viewport, and basic interaction readiness.</p>
+            <h3>2. 设备检查</h3>
+            <p>确认浏览器、屏幕尺寸和基本交互是否正常。</p>
             <div class="button-row">
-              <button id="deviceCheckBtn" class="ghost">Run device check</button>
+              <button id="deviceCheckBtn" class="ghost">运行设备检查</button>
             </div>
           </article>
           <article class="flow-card">
-            <h3>3. Training / example</h3>
-            <p>Show one example explanation so the participant understands how the interface behaves.</p>
+            <h3>3. 训练示例</h3>
+            <p>展示一个示例解释，让参与者先理解界面工作方式。</p>
             <div class="button-row">
-              <button id="trainingBtn" class="ghost">Play training example</button>
+              <button id="trainingBtn" class="ghost">播放训练示例</button>
             </div>
           </article>
           <article class="flow-card">
-            <h3>4. Start task</h3>
-            <p>Enter the CPR scenario and begin the timed decision sequence.</p>
+            <h3>4. 开始任务</h3>
+            <p>进入 CPR 场景并开始计时决策流程。</p>
             <div class="button-row">
-              <button id="beginTaskBtn" class="primary">Begin timed task</button>
+              <button id="beginTaskBtn" class="primary">开始计时任务</button>
             </div>
           </article>
           <article class="flow-card">
-            <h3>5. Interview entry</h3>
-            <p>After the task, use the interview section for retrospective comments.</p>
+            <h3>5. 访谈入口</h3>
+            <p>任务结束后，可以在这里填写回顾性意见。</p>
             <div class="button-row">
-              <button class="tab-button ghost" data-target="interview">Open interview entry</button>
+              <button class="tab-button ghost" data-target="interview">打开访谈</button>
             </div>
           </article>
         </div>
 
         <div class="status-strip">
-          <div id="participantOverview">Participant: - | Trial: - | Condition: -</div>
-          <div id="statusSummary">Current summary: -</div>
+          <div id="participantOverview">参与者：- | 试次：- | 条件：-</div>
+          <div id="statusSummary">当前概览：-</div>
         </div>
       </article>
     </section>
@@ -189,29 +185,29 @@
       <article class="card panel task-panel">
         <div class="stage-top">
           <div>
-            <p class="eyebrow">Formal task</p>
-            <h2 id="currentStageTitle">Task stage</h2>
+            <p class="eyebrow">正式任务</p>
+            <h2 id="currentStageTitle">任务阶段</h2>
             <p id="currentStageDesc" class="stage-desc"></p>
           </div>
           <div class="timer-box">
             <div class="timer-meta">
-              <span id="visibleCountdownLabel">Visible timer</span>
+              <span id="visibleCountdownLabel">可见倒计时</span>
               <strong id="totalClock">0:00</strong>
             </div>
             <div class="timer-ring">
               <span id="progressFill"></span>
             </div>
             <div class="timer-readout">
-              <span>Step clock</span>
+              <span>步骤计时</span>
               <strong id="timerText">--:--</strong>
             </div>
           </div>
         </div>
 
         <div class="chips-row">
-          <span class="mini-chip" id="pressureLabel">Low</span>
-          <span class="mini-chip" id="modeLabel">Instruction only</span>
-          <span class="mini-chip" id="stepProgressText">Step 1 / 5</span>
+          <span class="mini-chip" id="pressureLabel">低压</span>
+          <span class="mini-chip" id="modeLabel">纯指令</span>
+          <span class="mini-chip" id="stepProgressText">步骤 1 / 5</span>
         </div>
 
         <div id="scenarioBanner" class="scenario-banner"></div>
@@ -219,13 +215,13 @@
         <section id="explanationCard" class="explanation-card">
           <div class="section-head">
             <div>
-              <p class="eyebrow">Explanation</p>
-              <h3 id="explanationTitle">Condition explanation</h3>
+              <p class="eyebrow">解释</p>
+              <h3 id="explanationTitle">条件解释</h3>
             </div>
             <div class="button-row compact">
-              <button id="explainMoreBtn" class="ghost">More explanation</button>
-              <button id="repeatExplanationBtn" class="ghost">Repeat</button>
-              <button id="skipExplanationBtn" class="ghost">Skip</button>
+              <button id="explainMoreBtn" class="ghost">更多解释</button>
+              <button id="repeatExplanationBtn" class="ghost">重复播放</button>
+              <button id="skipExplanationBtn" class="ghost">跳过</button>
             </div>
           </div>
           <p id="explanationBody" class="explanation-body"></p>
@@ -236,33 +232,33 @@
         <section class="action-card">
           <div class="section-head">
             <div>
-              <p class="eyebrow">Behavior execution</p>
-              <h3>Choose the next action</h3>
+              <p class="eyebrow">行为执行</p>
+              <h3>请选择下一步动作</h3>
             </div>
-            <span class="helper">Every click is logged with timestamp and state context.</span>
+            <p class="helper">每次点击都会记录时间戳和状态上下文。</p>
           </div>
           <div id="responseGrid" class="choice-grid"></div>
           <div class="button-row">
-            <button id="acceptCorrectionBtn" class="ghost">Accept correction</button>
-            <button id="rejectCorrectionBtn" class="ghost">Reject correction</button>
+            <button id="acceptCorrectionBtn" class="ghost">接受纠错</button>
+            <button id="rejectCorrectionBtn" class="ghost">拒绝纠错</button>
           </div>
         </section>
 
         <div class="experiment-actions">
-          <button id="pauseBtn" class="ghost">Pause</button>
-          <button id="endTaskBtn" class="ghost">End task</button>
-          <button id="injectErrorBtn" class="ghost">Inject error</button>
-          <button id="injectInterruptBtn" class="ghost">Inject interruption</button>
-          <button id="injectReminderBtn" class="ghost">Inject reminder</button>
-          <button id="injectCorrectionBtn" class="ghost">Inject correction</button>
+          <button id="pauseBtn" class="ghost">暂停</button>
+          <button id="endTaskBtn" class="ghost">结束任务</button>
+          <button id="injectErrorBtn" class="ghost">插入错误</button>
+          <button id="injectInterruptBtn" class="ghost">插入打断</button>
+          <button id="injectReminderBtn" class="ghost">插入提醒</button>
+          <button id="injectCorrectionBtn" class="ghost">插入纠错</button>
         </div>
       </article>
 
       <aside class="card panel side-panel">
-        <h2>Live log</h2>
+        <h2>实时日志</h2>
         <div id="liveLog" class="log-list"></div>
         <div class="summary-card">
-          <h3>Current summary</h3>
+          <h3>当前概览</h3>
           <ul id="summaryList" class="bullet-list compact"></ul>
         </div>
       </aside>
@@ -271,27 +267,27 @@
     <section id="questionnaireView" class="panel-grid hidden">
       <article class="card panel">
         <div class="panel-head">
-          <h2>Questionnaires</h2>
-          <p>Keep the post-task ratings short enough to avoid survey fatigue.</p>
+          <h2>问卷</h2>
+          <p>任务后量表请尽量保持简短，以减少问卷疲劳。</p>
         </div>
         <div class="survey-layout">
           <div>
-            <h3>Pre-task</h3>
+            <h3>任务前</h3>
             <div id="questionnairePre" class="survey-group"></div>
           </div>
           <div>
-            <h3>Post-task</h3>
+            <h3>任务后</h3>
             <div id="questionnairePost" class="survey-group"></div>
           </div>
           <div>
-            <h3>Short ratings</h3>
+            <h3>简短评估</h3>
             <div id="questionnaireShort" class="survey-group"></div>
           </div>
         </div>
         <div class="button-grid">
-          <button class="tab-button primary" data-target="interview">Open interview</button>
-          <button id="addNoteBtn" class="ghost">Save notes</button>
-          <button id="clearBtn" class="ghost">Reset session</button>
+          <button class="tab-button primary" data-target="interview">打开访谈</button>
+          <button id="addNoteBtn" class="ghost">保存备注</button>
+          <button id="clearBtn" class="ghost">重置会话</button>
         </div>
       </article>
     </section>
@@ -299,18 +295,18 @@
     <section id="interviewView" class="panel-grid hidden">
       <article class="card panel">
         <div class="panel-head">
-          <h2>Retrospective interview entry</h2>
-          <p>Use this page to capture open-ended comments after the task.</p>
+          <h2>回顾访谈</h2>
+          <p>任务结束后可在这里填写开放式意见。</p>
         </div>
         <label class="field">
-          <span>Open-ended reflection</span>
-          <textarea id="participantNotes" rows="8" placeholder="What was confusing? Which explanation felt most useful? What changed your action?"></textarea>
+          <span>开放式反馈</span>
+          <textarea id="participantNotes" rows="8" placeholder="哪里最困惑？哪种解释最有帮助？是什么改变了你的动作？"></textarea>
         </label>
         <div class="button-grid">
-          <button id="saveDraftBtn" class="ghost">Save draft</button>
-          <button id="addNoteBtn" class="ghost">Save note</button>
-          <button id="finishSessionBtn" class="primary">Finish session</button>
-          <button class="tab-button primary" data-target="export">Go to export</button>
+          <button id="saveDraftBtn" class="ghost">保存草稿</button>
+          <button id="addNoteBtn" class="ghost">保存备注</button>
+          <button id="finishSessionBtn" class="primary">结束会话</button>
+          <button class="tab-button primary" data-target="export">前往导出</button>
         </div>
       </article>
     </section>
@@ -318,53 +314,53 @@
     <section id="experimenterView" class="panel-grid hidden">
       <article class="card panel">
         <div class="panel-head">
-          <h2>Experimenter console</h2>
-          <p>Use this panel to control the trial, inject events, and monitor the current state.</p>
+          <h2>实验员控制台</h2>
+          <p>在这里控制试次、插入事件并查看当前状态。</p>
         </div>
         <div class="console-grid">
           <div class="console-card">
-            <h3>Status</h3>
-            <p id="experimenterStatus">Ready.</p>
-            <p id="experimenterStep">No active step.</p>
-            <p id="experimenterMetrics">No metrics yet.</p>
+            <h3>状态</h3>
+            <p id="experimenterStatus">就绪。</p>
+            <p id="experimenterStep">暂无激活步骤。</p>
+            <p id="experimenterMetrics">暂无指标。</p>
           </div>
           <div class="console-card">
-            <h3>Controls</h3>
+            <h3>控制</h3>
             <div class="button-grid">
-              <button id="beginTaskBtn2" class="primary">Start task</button>
-              <button id="pauseBtn2" class="ghost">Pause task</button>
-              <button id="endTaskBtn2" class="ghost">End task</button>
-              <button id="injectErrorBtn2" class="ghost">Inject error</button>
-              <button id="injectInterruptBtn2" class="ghost">Inject interruption</button>
-              <button id="injectReminderBtn2" class="ghost">Inject reminder</button>
-              <button id="previousStepBtn" class="ghost">Previous step</button>
-              <button id="repeatStepBtn" class="ghost">Repeat current step</button>
+              <button id="beginTaskBtn2" class="primary">开始任务</button>
+              <button id="pauseBtn2" class="ghost">暂停任务</button>
+              <button id="endTaskBtn2" class="ghost">结束任务</button>
+              <button id="injectErrorBtn2" class="ghost">插入错误</button>
+              <button id="injectInterruptBtn2" class="ghost">插入打断</button>
+              <button id="injectReminderBtn2" class="ghost">插入提醒</button>
+              <button id="previousStepBtn" class="ghost">上一步</button>
+              <button id="repeatStepBtn" class="ghost">重复当前步骤</button>
             </div>
           </div>
           <div class="console-card">
-            <h3>Condition control</h3>
-            <p>Change the current condition only before the trial starts, unless you are intentionally testing switching behavior.</p>
-            <button id="switchConditionBtn" class="ghost">Refresh condition chips</button>
+            <h3>条件控制</h3>
+            <p>尽量在试次开始前切换条件；如需测试切换，也可以在任务中调整。</p>
+            <button id="switchConditionBtn" class="ghost">刷新条件标签</button>
           </div>
           <div class="console-card">
-            <h3>Annotations</h3>
+            <h3>标注</h3>
             <label class="field">
-              <span>Annotation type</span>
+              <span>标注类型</span>
               <select id="annotationType">
-                <option value="error">Error</option>
-                <option value="interruption">Interruption</option>
-                <option value="recovery">Recovery</option>
-                <option value="correction_accept">Correction accepted</option>
-                <option value="correction_reject">Correction rejected</option>
-                <option value="observer_note">Observer note</option>
+                <option value="error">错误</option>
+                <option value="interruption">打断</option>
+                <option value="recovery">恢复</option>
+                <option value="correction_accept">已接受纠错</option>
+                <option value="correction_reject">已拒绝纠错</option>
+                <option value="observer_note">观察备注</option>
               </select>
             </label>
             <label class="field">
-              <span>Annotation text</span>
-              <textarea id="annotationInput" rows="4" placeholder="Type an observation for later coding"></textarea>
+              <span>标注内容</span>
+              <textarea id="annotationInput" rows="4" placeholder="填写供后续编码的观察内容"></textarea>
             </label>
             <div class="button-row">
-              <button id="annotationBtn" class="primary">Add annotation</button>
+              <button id="annotationBtn" class="primary">添加标注</button>
             </div>
           </div>
         </div>
@@ -374,19 +370,19 @@
     <section id="replayView" class="panel-grid hidden">
       <article class="card panel replay-panel">
         <div class="panel-head">
-          <h2>Replay & annotation</h2>
-          <p>Use the event timeline to inspect behavior, step transitions, and errors.</p>
+          <h2>回放与标注</h2>
+          <p>使用事件时间线检查行为、步骤切换和错误。</p>
         </div>
         <div class="replay-controls">
           <select id="replayFilter">
-            <option value="all">All events</option>
-            <option value="step_presented">Step presented</option>
-            <option value="choice_made">Choice made</option>
-            <option value="step_error">Error</option>
-            <option value="injected_interruption">Interruption</option>
-            <option value="correction_accepted">Correction accepted</option>
+            <option value="all">全部事件</option>
+            <option value="step_presented">步骤呈现</option>
+            <option value="choice_made">作出选择</option>
+            <option value="step_error">错误</option>
+            <option value="injected_interruption">打断</option>
+            <option value="correction_accepted">纠错已接受</option>
           </select>
-          <button id="downloadReplayBtn" class="ghost">Download replay JSON</button>
+          <button id="downloadReplayBtn" class="ghost">下载回放 JSON</button>
         </div>
         <div class="replay-layout">
           <div id="replayList" class="replay-list"></div>
@@ -398,20 +394,20 @@
     <section id="exportView" class="panel-grid hidden">
       <article class="card panel">
         <div class="panel-head">
-          <h2>Export</h2>
-          <p>Export the raw session record as JSON or CSV for downstream analysis.</p>
+          <h2>导出</h2>
+          <p>可将完整会话记录导出为 JSON 或 CSV，供后续分析使用。</p>
         </div>
         <div class="button-grid">
-          <button id="exportJsonBtn" class="primary">Export JSON</button>
-          <button id="exportCsvBtn" class="ghost">Export CSV</button>
+          <button id="exportJsonBtn" class="primary">导出 JSON</button>
+          <button id="exportCsvBtn" class="ghost">导出 CSV</button>
         </div>
         <div class="export-grid">
           <div>
-            <h3>JSON preview</h3>
+            <h3>JSON 预览</h3>
             <pre id="resultJson" class="code-box"></pre>
           </div>
           <div>
-            <h3>CSV preview</h3>
+            <h3>CSV 预览</h3>
             <pre id="resultCsv" class="code-box"></pre>
           </div>
         </div>
@@ -421,13 +417,13 @@
     <section id="completeView" class="panel-grid hidden">
       <article class="card panel">
         <div class="panel-head">
-          <h2>Session complete</h2>
-          <p>The session is finished and the export data is ready.</p>
+          <h2>会话完成</h2>
+          <p>会话已经结束，导出数据已准备好。</p>
         </div>
         <div class="button-grid">
-          <button class="tab-button primary" data-target="export">Review export</button>
-          <button class="tab-button ghost" data-target="replay">Open replay</button>
-          <button class="ghost" id="clearBtn2">Reset session</button>
+          <button class="tab-button primary" data-target="export">查看导出</button>
+          <button class="tab-button ghost" data-target="replay">打开回放</button>
+          <button class="ghost" id="clearBtn2">重置会话</button>
         </div>
       </article>
     </section>
