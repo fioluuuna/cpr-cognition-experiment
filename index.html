@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f5f6c" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>CPR 认知实验</title>
+  <title>CPR 语音 Copilot 实验</title>
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icon.svg" />
   <link rel="stylesheet" href="/styles.css" />
@@ -18,15 +18,15 @@
   <main class="app-shell">
     <header class="hero card">
       <div class="hero-copy">
-        <p class="eyebrow">成人 CPR 引导研究工具</p>
-        <h1>CPR 认知实验</h1>
+        <p class="eyebrow">成人 CPR 语音引导研究原型</p>
+        <h1>CPR 语音 Copilot 实验</h1>
         <p class="lede">
-          这是一个面向研究的网页版原型，用于操控解释深度、时间压力、认知负荷、信任校准和行为执行，并稳定记录全过程日志。
+          这是一个面向研究的网页原型，用来比较不同语音引导方式、解释深度和安抚语句，如何影响高压 CPR 情境下的行动启动、信任校准与恢复能力。
         </p>
       </div>
       <div class="hero-stats">
         <span class="chip" id="connectionChip">在线</span>
-        <span class="chip" id="conditionChip">解释条件</span>
+        <span class="chip" id="conditionChip">语音策略</span>
         <span class="chip" id="pressureChip">时间压力</span>
         <span class="chip" id="trialChip">试次</span>
         <span class="chip" id="stepChip">步骤</span>
@@ -48,7 +48,7 @@
       <article class="card panel">
         <div class="panel-head">
           <h2>会话设置</h2>
-          <p>开始前请设置参与者编号、试次、解释条件、压力条件和场景版本。</p>
+          <p>在开始前设置参与者编号、试次、语音策略、压力条件和场景版本。</p>
         </div>
         <div class="form-grid">
           <label class="field">
@@ -60,7 +60,7 @@
             <input id="trialIndex" type="number" min="1" value="1" />
           </label>
           <label class="field">
-            <span>解释深度</span>
+            <span>语音策略</span>
             <select id="condition">
               <option value="control">对照组</option>
               <option value="direct">纯指令型</option>
@@ -110,10 +110,10 @@
       <aside class="card panel side-panel">
         <h2>研究逻辑</h2>
         <ul class="bullet-list">
-          <li>自变量：解释深度、时间压力、场景版本。</li>
-          <li>机制：认知负荷、信任校准、中断恢复。</li>
-          <li>结果：响应延迟、流程完整度、纠错接受、执行质量。</li>
-          <li>日志分为会话级、试次级和步骤级。</li>
+          <li>这版要研究的是：不同语音引导和安抚方式，会怎样影响 CPR 场景里的行动启动、信任和恢复。</li>
+          <li>为什么要做这个：看系统说得更详细，是否真的更有帮助，还是会让人更犹豫。</li>
+          <li>会看哪些结果：响应延迟、流程完整度、纠错接受、中断恢复和主观负荷。</li>
+          <li>当前版本是研究原型，不是最终急救产品。</li>
         </ul>
         <div class="mini-grid">
           <div class="mini-card">
@@ -124,6 +124,10 @@
             <strong>平台</strong>
             <p>可在 iPhone 的 Safari 和其他手机浏览器中运行。</p>
           </div>
+          <div class="mini-card">
+            <strong>当前范围</strong>
+            <p>这一版先做语音引导和动作选择；真实视频识别是后续可加模块。</p>
+          </div>
         </div>
       </aside>
     </section>
@@ -132,13 +136,13 @@
       <article class="card panel large-panel">
         <div class="panel-head">
           <h2>参与者流程</h2>
-          <p>知情同意、设备检查、训练示例、正式任务和事后回顾被组织成连续流程。</p>
+          <p>知情同意、设备检查、训练示例、正式任务和事后回顾被组织成连续流程。当前版本通过语音引导和按钮式动作选择模拟 CPR 决策，不做真实视觉识别。</p>
         </div>
 
         <div class="flow-steps">
           <article class="flow-card">
             <h3>1. 研究说明</h3>
-            <p>说明这是一个 CPR 认知研究，而不是医疗产品。</p>
+            <p>说明这是一个 CPR 语音引导研究，而不是医疗产品。</p>
             <div class="button-row">
               <button id="consentYes" class="primary">同意参与</button>
               <button id="consentNo" class="ghost">不同意</button>
@@ -153,7 +157,7 @@
           </article>
           <article class="flow-card">
             <h3>3. 训练示例</h3>
-            <p>展示一个示例解释，让参与者先理解界面工作方式。</p>
+            <p>播放一个语音示例，让参与者理解系统如何引导。</p>
             <div class="button-row">
               <button id="trainingBtn" class="ghost">播放训练示例</button>
             </div>
@@ -215,8 +219,8 @@
         <section id="explanationCard" class="explanation-card">
           <div class="section-head">
             <div>
-              <p class="eyebrow">解释</p>
-              <h3 id="explanationTitle">条件解释</h3>
+              <p class="eyebrow">系统语音</p>
+              <h3 id="explanationTitle">当前引导</h3>
             </div>
             <div class="button-row compact">
               <button id="explainMoreBtn" class="ghost">更多解释</button>
@@ -227,6 +231,10 @@
           <p id="explanationBody" class="explanation-body"></p>
           <ul id="explanationBullets" class="bullet-list"></ul>
           <div id="explanationCues" class="cue-box"></div>
+          <div class="button-row compact" style="margin-top: 12px;">
+            <button id="panicBtn" class="ghost">我很害怕</button>
+            <button id="unsureBtn" class="ghost">我不确定</button>
+          </div>
         </section>
 
         <section class="action-card">
@@ -268,7 +276,7 @@
       <article class="card panel">
         <div class="panel-head">
           <h2>问卷</h2>
-          <p>任务后量表请尽量保持简短，以减少问卷疲劳。</p>
+          <p>任务后量表尽量保持简短，以减少问卷疲劳。</p>
         </div>
         <div class="survey-layout">
           <div>
@@ -300,7 +308,7 @@
         </div>
         <label class="field">
           <span>开放式反馈</span>
-          <textarea id="participantNotes" rows="8" placeholder="哪里最困惑？哪种解释最有帮助？是什么改变了你的动作？"></textarea>
+          <textarea id="participantNotes" rows="8" placeholder="哪里最困惑？哪种语音最有帮助？是什么改变了你的动作？"></textarea>
         </label>
         <div class="button-grid">
           <button id="saveDraftBtn" class="ghost">保存草稿</button>

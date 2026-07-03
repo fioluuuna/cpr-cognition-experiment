@@ -253,6 +253,7 @@ const state = {
   explanationRequests: 0,
   explanationReplays: 0,
   explanationSkips: 0,
+  supportRequests: 0,
   pauseCount: 0,
   isPaused: false,
   pausedRemainingMs: 0,
@@ -364,6 +365,8 @@ const els = {
   explanationBody: $("#explanationBody"),
   explanationBullets: $("#explanationBullets"),
   explanationCues: $("#explanationCues"),
+  panicBtn: $("#panicBtn"),
+  unsureBtn: $("#unsureBtn"),
   responseGrid: $("#responseGrid"),
   liveLog: $("#liveLog"),
   statusSummary: $("#statusSummary"),
@@ -898,6 +901,325 @@ const QUESTIONNAIRE_GROUPS = {
   },
 };
 
+const SUPPORT_TEXT = {
+  scene_safety: {
+    zh: {
+      panic: "先别急，我们先确认现场安全。你只需要做下一步，不需要一次想完所有事情。",
+      unsure: "你现在做得对，先把注意力放在“安全”这一步。",
+    },
+    en: {
+      panic: "Take it step by step. First make sure the scene is safe.",
+      unsure: "You are doing the right thing. Focus on the safety step first.",
+    },
+  },
+  response_check: {
+    zh: {
+      panic: "没关系，先拍打并呼叫，再看呼吸。我们只做这一小步。",
+      unsure: "先判断有没有反应，然后继续下一步。",
+    },
+    en: {
+      panic: "It is okay. Tap, shout, and check breathing. Just do this one step.",
+      unsure: "First check for responsiveness, then move on.",
+    },
+  },
+  call_help: {
+    zh: {
+      panic: "你可以让旁人帮忙拨打 120。你不用一个人把所有事都做完。",
+      unsure: "先把电话打出去，AED 也一起请求。",
+    },
+    en: {
+      panic: "You can ask someone nearby to call 120. You do not have to do everything alone.",
+      unsure: "Make the call first and request an AED.",
+    },
+  },
+  compressions: {
+    zh: {
+      panic: "先开始按压。现在最重要的是先动起来，不需要先完美。",
+      unsure: "你已经知道下一步了，现在直接开始按压。",
+    },
+    en: {
+      panic: "Start compressions now. Getting going matters more than being perfect.",
+      unsure: "You know the next step. Begin compressions now.",
+    },
+  },
+  aed_handover: {
+    zh: {
+      panic: "很好，保持节奏，把 AED 和关键信息交接好。",
+      unsure: "最后一步了，按现在的流程把交接完成。",
+    },
+    en: {
+      panic: "Good. Keep the rhythm and hand over the AED and the key facts.",
+      unsure: "You are at the last step. Finish the handover.",
+    },
+  },
+};
+
+UI_TEXT.zh = {
+  title: "CPR 语音 Copilot 实验",
+  heroEyebrow: "成人 CPR 语音引导研究原型",
+  heroLede:
+    "这是一个面向研究的网页原型，用来比较不同语音引导方式、解释深度和安抚语句，如何影响高压 CPR 情境下的行动启动、信任校准与恢复能力。",
+  setupTab: "设置",
+  participantTab: "参与者流程",
+  taskTab: "正式任务",
+  questionnaireTab: "问卷",
+  experimenterTab: "实验员控制台",
+  replayTab: "回放与标注",
+  exportTab: "导出",
+  currentStatus: "当前状态",
+  experimentReady: "可开始配置试次",
+  setupTitle: "会话设置",
+  setupDesc: "在开始前设置参与者编号、试次、语音策略、压力条件和场景版本。",
+  participantLabel: "参与者编号",
+  trialLabel: "试次编号",
+  conditionLabel: "语音策略",
+  pressureLabel: "时间压力",
+  scenarioLabel: "场景版本",
+  explanationModeLabel: "界面模式",
+  countdownLabel: "任务中显示倒计时",
+  notesLabel: "实验员备注",
+  randomize: "随机分配",
+  loadDraft: "载入草稿",
+  saveDraft: "保存草稿",
+  startExperiment: "开始实验",
+  researchLogic: "研究逻辑",
+  supportExport: "支持导出",
+  platformSupport: "平台",
+  participantFlowTitle: "参与者流程",
+  participantFlowDesc: "知情同意、设备检查、训练示例、正式任务和事后回顾被组织成连续流程。",
+  taskTitle: "正式任务",
+  taskDesc: "在 CPR 场景中，参与者根据系统语音提示完成每一步动作。",
+  explanationTitle: "系统语音",
+  actionTitle: "请选择下一步动作",
+  logTitle: "实时日志",
+  summaryTitle: "当前概览",
+  questionnaireTitle: "问卷",
+  interviewTitle: "回顾访谈",
+  experimenterTitle: "实验员控制台",
+  replayTitle: "回放与标注",
+  exportTitle: "数据导出",
+  completeTitle: "会话完成",
+  visibleTimer: "可见倒计时",
+  hiddenTimer: "隐藏倒计时",
+  online: "在线",
+  offline: "离线",
+  participantOverview: "参与者",
+  trialOverview: "试次",
+  scenarioOverview: "场景",
+  countdownOverview: "倒计时",
+  stepPrefix: "步骤",
+  pause: "暂停",
+  resume: "继续",
+  endTask: "结束任务",
+  acceptCorrection: "接受纠错",
+  rejectCorrection: "拒绝纠错",
+  saveNote: "保存备注",
+  finishSession: "结束会话",
+  openInterview: "打开访谈",
+  goExport: "前往导出",
+  viewExport: "查看导出",
+  openReplay: "打开回放",
+  clearSession: "重置会话",
+  addAnnotation: "添加标注",
+  replayJson: "下载回放 JSON",
+  exportJson: "导出 JSON",
+  exportCsv: "导出 CSV",
+  chooseCondition: "刷新条件标签",
+  noActiveStep: "暂无激活步骤",
+  ready: "就绪",
+  hidden: "隐藏",
+  visible: "可见",
+  pauseHint: "任务已由实验员暂停。",
+  downloadBlocked: "浏览器阻止了下载，已在页面中显示预览。",
+};
+
+UI_TEXT.en = {
+  title: "CPR Voice Copilot Experiment",
+  heroEyebrow: "Adult CPR Voice Guidance Research Prototype",
+  heroLede:
+    "A research web prototype for comparing voice guidance styles, explanation depth, and reassurance phrases in high-pressure CPR settings.",
+  setupTab: "Setup",
+  participantTab: "Participant Flow",
+  taskTab: "Task",
+  questionnaireTab: "Questionnaire",
+  experimenterTab: "Experimenter",
+  replayTab: "Replay & Annotation",
+  exportTab: "Export",
+  currentStatus: "Current Status",
+  experimentReady: "Ready to configure the trial",
+  setupTitle: "Session Setup",
+  setupDesc: "Before starting, set the participant ID, trial, voice strategy, pressure condition, and scenario.",
+  participantLabel: "Participant ID",
+  trialLabel: "Trial Number",
+  conditionLabel: "Voice strategy",
+  pressureLabel: "Time pressure",
+  scenarioLabel: "Scenario version",
+  explanationModeLabel: "Interface mode",
+  countdownLabel: "Show countdown during task",
+  notesLabel: "Experimenter notes",
+  randomize: "Randomize",
+  loadDraft: "Load draft",
+  saveDraft: "Save draft",
+  startExperiment: "Start experiment",
+  researchLogic: "Research logic",
+  supportExport: "Export support",
+  platformSupport: "Platform",
+  participantFlowTitle: "Participant Flow",
+  participantFlowDesc: "Consent, device check, training example, formal task, and retrospective interview are organized as one continuous flow.",
+  taskTitle: "Task",
+  taskDesc: "Inside the CPR scenario, the participant completes each action using system voice guidance.",
+  explanationTitle: "System voice",
+  actionTitle: "Choose the next action",
+  logTitle: "Live Log",
+  summaryTitle: "Current Summary",
+  questionnaireTitle: "Questionnaire",
+  interviewTitle: "Retrospective Interview",
+  experimenterTitle: "Experimenter Console",
+  replayTitle: "Replay & Annotation",
+  exportTitle: "Data Export",
+  completeTitle: "Session Complete",
+  visibleTimer: "Visible countdown",
+  hiddenTimer: "Hidden countdown",
+  online: "Online",
+  offline: "Offline",
+  participantOverview: "Participant",
+  trialOverview: "Trial",
+  scenarioOverview: "Scenario",
+  countdownOverview: "Countdown",
+  stepPrefix: "Step",
+  pause: "Pause",
+  resume: "Resume",
+  endTask: "End task",
+  acceptCorrection: "Accept correction",
+  rejectCorrection: "Reject correction",
+  saveNote: "Save note",
+  finishSession: "Finish session",
+  openInterview: "Open interview",
+  goExport: "Go to export",
+  viewExport: "View export",
+  openReplay: "Open replay",
+  clearSession: "Reset session",
+  addAnnotation: "Add annotation",
+  replayJson: "Download replay JSON",
+  exportJson: "Export JSON",
+  exportCsv: "Export CSV",
+  chooseCondition: "Refresh condition label",
+  noActiveStep: "No active step",
+  ready: "Ready",
+  hidden: "Hidden",
+  visible: "Visible",
+  pauseHint: "Task paused by experimenter.",
+  downloadBlocked: "The browser blocked the download, so the preview is shown on the page.",
+};
+
+CONDITION_TEXT.control.zh = { label: "对照组", explanation: "无解释", cue: "系统只显示下一步动作。" };
+CONDITION_TEXT.direct.zh = { label: "纯指令型", explanation: "仅指令", cue: "一句简短指令加下一步动作。" };
+CONDITION_TEXT.concise.zh = { label: "简释型", explanation: "简短理由", cue: "简短指令加一句理由。" };
+CONDITION_TEXT.full.zh = { label: "全释型", explanation: "详细理由", cue: "指令加更完整的理由和步骤背景。" };
+
+PRESSURE_TEXT.low.zh = { label: "低压", visibleLabel: "可见倒计时" };
+PRESSURE_TEXT.high.zh = { label: "高压", visibleLabel: "可见倒计时" };
+PRESSURE_TEXT.hidden.zh = { label: "隐藏倒计时", visibleLabel: "隐藏倒计时" };
+
+SCENARIO_TEXT.baseline.zh = { label: "基础 CPR", description: "单一成人 CPR 场景，不插入打断。" };
+SCENARIO_TEXT.interrupt.zh = { label: "打断版 CPR", description: "在中段由旁观者插入一次打断。" };
+SCENARIO_TEXT.error.zh = { label: "纠错版 CPR", description: "插入一个故意的错误并随后纠正。" };
+SCENARIO_TEXT.stress.zh = { label: "高压力 CPR", description: "更紧的节奏、一次打断和一次后期提醒。" };
+
+STEP_TEXT.scene_safety.zh = {
+  title: "场景安全",
+  prompt: "在接近患者前先确认环境安全。",
+  rationale: "危险环境可能造成新的伤害。先确认安全是急救流程的第一道门槛。",
+  details: "检查火源、车辆、电源或拥挤风险。必要时可请旁人协助，但不要贸然进入危险区域。",
+  correct: "safe",
+  options: [
+    { key: "safe", label: "小心接近并检查现场", note: "这符合流程。" },
+    { key: "rush", label: "立刻直接冲进去", note: "这会增加风险。" },
+    { key: "call", label: "请旁人拨打急救电话", note: "有帮助，但先确认安全。" },
+  ],
+  corrections: ["在做任何事之前，先确认现场安全。", "如果现场不安全，先控制风险再继续。"],
+};
+STEP_TEXT.response_check.zh = {
+  title: "检查反应",
+  prompt: "拍打并呼喊，然后检查呼吸。",
+  rationale: "反应和呼吸状态决定是否进入 CPR 分支。",
+  details: "尽快从观察进入行动。系统化检查能减少犹豫，并帮助参与者理解是否需要 CPR。",
+  correct: "check",
+  options: [
+    { key: "check", label: "拍打、呼喊并检查呼吸", note: "正确的急救检查。" },
+    { key: "wait", label: "静静等待观察", note: "这会延迟行动。" },
+    { key: "water", label: "给患者喂水", note: "此时不合适。" },
+  ],
+  corrections: ["如果患者无反应，就继续下一步。", "关键判断是是否正常呼吸，而不是是否在动。"],
+};
+STEP_TEXT.call_help.zh = {
+  title: "呼叫帮助",
+  prompt: "拨打 120，并请求 AED。",
+  rationale: "尽早呼叫能更快获得专业救援和除颤仪，同时让一名施救者继续 CPR。",
+  details: "如果有旁人，可请对方拨打电话。这个步骤用于观察解释是否能帮助参与者保持行动导向。",
+  correct: "call_120",
+  options: [
+    { key: "call_120", label: "拨打 120 并请求 AED", note: "正确的急救升级。" },
+    { key: "video", label: "先录个视频", note: "此时没有帮助。" },
+    { key: "wait", label: "继续看着什么都不做", note: "会打断响应链。" },
+  ],
+  corrections: ["应立即请求急救服务和 AED 支持。", "不要等完全确定后再打电话。"],
+};
+STEP_TEXT.compressions.zh = {
+  title: "开始按压",
+  prompt: "现在开始胸外按压。",
+  rationale: "对于疑似心脏骤停，尽早按压有助于在救援到来前维持循环。",
+  details: "这是最关键的动作阶段。解释应支持执行，但不能让参与者负担过重。",
+  correct: "compress",
+  options: [
+    { key: "compress", label: "开始按压", note: "正确的立即动作。" },
+    { key: "search", label: "去网上再查查", note: "这一步太慢了。" },
+    { key: "ask", label: "让患者坐起来", note: "若无反应则不合适。" },
+  ],
+  corrections: ["按压质量重要，但现在必须先开始动作。", "如果刚才犹豫了，请立刻回到按压步骤。"],
+};
+STEP_TEXT.aed_handover.zh = {
+  title: "AED 与交接",
+  prompt: "准备使用 AED，并交接关键信息。",
+  rationale: "最后阶段用于检验参与者能否继续流程并清楚总结情况。",
+  details: "这个阶段结合了持续执行、中断恢复和向下一位施救者的任务交接。",
+  correct: "aed",
+  options: [
+    { key: "aed", label: "准备 AED 并完成交接", note: "正确的最终动作。" },
+    { key: "stop", label: "立刻停下离开", note: "会打断流程。" },
+    { key: "forget", label: "忘掉前面的步骤", note: "会降低执行质量。" },
+  ],
+  corrections: ["交接时要保留任务状态。", "不要漏掉 AED 或总结步骤。"],
+};
+
+QUESTIONNAIRE_GROUPS.zh = {
+  pre: [
+    ["experience", "过往 CPR / 急救经验"],
+    ["selfEfficacy", "我觉得自己有能力在紧急情境下提供帮助"],
+    ["trustBaseline", "我通常信任 AI 指引"],
+  ],
+  post: [
+    ["trust", "我觉得这套引导是可信的"],
+    ["calibration", "我对系统的信任处于合适水平"],
+    ["understand", "这个解释很容易理解"],
+    ["control", "我仍然觉得自己在掌控决策"],
+    ["load", "这个任务很费脑力"],
+    ["stress", "这个任务让我感到紧张"],
+    ["actionability", "这个引导帮助我知道下一步该做什么"],
+    ["use", "如果是真实紧急情境，我愿意使用类似系统"],
+  ],
+  short: [
+    ["load", "心理负荷"],
+    ["pressure", "时间压力"],
+    ["control", "控制感"],
+  ],
+  surveyTypes: [
+    { id: "stateTrust", label: "信任状态" },
+    { id: "cognitiveLoad", label: "认知负荷" },
+    { id: "actionQuality", label: "行为质量" },
+  ],
+};
+
 function loc(value, locale = state.locale) {
   if (value && typeof value === "object" && ("zh" in value || "en" in value)) {
     return locale === "en" ? value.en ?? value.zh ?? "" : value.zh ?? value.en ?? "";
@@ -970,6 +1292,7 @@ function buildSessionSummary() {
     explanationRequests: state.explanationRequests,
     explanationReplays: state.explanationReplays,
     explanationSkips: state.explanationSkips,
+    supportRequests: state.supportRequests,
     correctionAcceptCount: state.correctionAcceptCount,
     correctionRejectCount: state.correctionRejectCount,
     trustMean: trust.length ? Number(mean(trust).toFixed(2)) : 0,
@@ -1117,6 +1440,7 @@ function renderSummary() {
         `Explanation requests: ${summary.explanationRequests}`,
         `Replays: ${summary.explanationReplays}`,
         `Skips: ${summary.explanationSkips}`,
+        `Support cues: ${state.supportRequests}`,
         `Interruptions: ${summary.interruptions}`,
         `Errors: ${summary.errors}`,
         `Correction acceptance: ${summary.correctionAcceptCount}`,
@@ -1130,6 +1454,7 @@ function renderSummary() {
         `解释请求: ${summary.explanationRequests}`,
         `重复解释: ${summary.explanationReplays}`,
         `跳过解释: ${summary.explanationSkips}`,
+        `安抚提示: ${state.supportRequests}`,
         `中断: ${summary.interruptions}`,
         `错误: ${summary.errors}`,
         `纠错接受: ${summary.correctionAcceptCount}`,
@@ -1264,6 +1589,23 @@ function renderActionButtons() {
     button.addEventListener("click", () => submitChoice(option.key, option.label, false));
     els.responseGrid.appendChild(button);
   });
+}
+
+function triggerSupport(kind = "panic") {
+  const step = currentStep();
+  if (!step) return;
+  const stepSupport = SUPPORT_TEXT[step.id]?.[state.locale] || {};
+  const text = stepSupport[kind] || (state.locale === "en" ? "Take a breath and continue with the next step." : "先稳住，我们继续下一步。");
+  state.supportRequests += 1;
+  addEvent("support_requested", {
+    kind,
+    count: state.supportRequests,
+    text,
+  }, step.id);
+  els.currentStageDesc.textContent = text;
+  els.explanationBody.textContent = text;
+  els.explanationCues.textContent = state.locale === "en" ? "Support cue delivered." : "已发送安抚提示。";
+  speak(text, `support_${kind}`);
 }
 
 function startPressureClock() {
@@ -1401,6 +1743,7 @@ function beginTrial() {
   state.explanationRequests = 0;
   state.explanationReplays = 0;
   state.explanationSkips = 0;
+  state.supportRequests = 0;
   state.pauseCount = 0;
   state.isPaused = false;
   state.pausedRemainingMs = 0;
@@ -1894,6 +2237,12 @@ function bindEvents() {
   });
   els.pauseBtn.addEventListener("click", pauseTask);
   els.pauseBtn2.addEventListener("click", pauseTask);
+  if (els.panicBtn) {
+    els.panicBtn.addEventListener("click", () => triggerSupport("panic"));
+  }
+  if (els.unsureBtn) {
+    els.unsureBtn.addEventListener("click", () => triggerSupport("unsure"));
+  }
   els.endTaskBtn.addEventListener("click", () => {
     state.stageFlags.taskDone = true;
     endTask();
@@ -2050,6 +2399,7 @@ function resetAll() {
   state.explanationRequests = 0;
   state.explanationReplays = 0;
   state.explanationSkips = 0;
+  state.supportRequests = 0;
   state.pauseCount = 0;
   state.isPaused = false;
   state.pausedRemainingMs = 0;
@@ -2175,6 +2525,8 @@ function applyLocale() {
     explainMoreBtn: locale === "en" ? "More explanation" : "更多解释",
     repeatExplanationBtn: locale === "en" ? "Repeat explanation" : "重复播放",
     skipExplanationBtn: locale === "en" ? "Skip" : "跳过",
+    panicBtn: locale === "en" ? "I'm scared" : "我很害怕",
+    unsureBtn: locale === "en" ? "I'm not sure" : "我不确定",
     acceptCorrectionBtn: UI_TEXT[locale].acceptCorrection,
     rejectCorrectionBtn: UI_TEXT[locale].rejectCorrection,
     addNoteBtn: UI_TEXT[locale].saveNote,
